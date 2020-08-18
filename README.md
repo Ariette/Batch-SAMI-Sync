@@ -27,3 +27,8 @@ pip install -r requirements.txt
 ## To Do
 + 검색 텍스트 정규식 지원
 + 자막 저장 인코딩 수동 설정 지원
+
+## License
++ [PySide2](https://pypi.org/project/PySide2/) © The Qt Company Ltd  - LGPL v3.0, [Source](https://download.qt.io/official_releases/QtForPython/pyside2/)
++ [chardet](https://pypi.org/project/chardet/) © Daniel Blanchard  - LGPL v2.1, [Source](https://github.com/chardet/chardet)
++ [Material Icons](https://material.io/resources/icons/) © Google - Apache License v2.0, [Source](https://github.com/google/material-design-icons) Modified by Ariette(see icon.py)
