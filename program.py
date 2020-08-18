@@ -3,16 +3,17 @@
 import ntpath
 import os
 import sys
-import chardet
 from fnmatch import fnmatch
-from sami import Sami
 
+import chardet
 from PySide2.QtCore import QSize, Qt
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import *
+from PySide2.QtWidgets import QMessageBox, QMainWindow, QWidget, QGridLayout, QTabWidget, QLabel, QLineEdit, QHBoxLayout, QDoubleSpinBox, QSpinBox, QPushButton, QRadioButton, QTreeWidget, QGroupBox, QCheckBox, QTreeWidgetItem, QInputDialog, QFileDialog, QTreeWidgetItemIterator, QApplication, \
+    QScrollArea
+
+from sami import Sami
 
 
-# Extended TreeWidget Class for Drag & Drop capability.
 class ScrollMessageBox(QMessageBox):
     def __init__(self, *args, **kwargs):
         QMessageBox.__init__(self, *args, **kwargs)
@@ -116,24 +117,24 @@ class App(QMainWindow):
         self.que_label = QLabel('작업 목록')
         self.que_label.setFixedHeight(24)
         self.que_widget = QWidget()
-        self.que_widget.setFixedHeight(110)
+        self.que_widget.setFixedHeight(114)
         self.que_layout = QGridLayout()
         self.que_layout.setContentsMargins(0, 0, 0, 0)
         self.que_list = QTreeWidget()
         self.que_list.setHeaderLabels(['작업', '옵션'])
-        self.que_delete_button = QPushButton(QIcon('./assets/remove.png'), '')
+        self.que_delete_button = QPushButton(QIcon(':/remove.png'), '')
         self.que_delete_button.setFixedSize(icon_button_size)
         self.que_delete_button.setIconSize(icon_size)
         self.que_delete_button.setToolTip('목록 삭제')
-        self.que_up_button = QPushButton(QIcon('./assets/up.png'), '')
+        self.que_up_button = QPushButton(QIcon(':/up.png'), '')
         self.que_up_button.setIconSize(icon_size)
         self.que_up_button.setFixedSize(icon_button_size)
         self.que_up_button.setToolTip('위로')
-        self.que_down_button = QPushButton(QIcon('./assets/down.png'), '')
+        self.que_down_button = QPushButton(QIcon(':/down.png'), '')
         self.que_down_button.setIconSize(icon_size)
         self.que_down_button.setFixedSize(icon_button_size)
         self.que_down_button.setToolTip('아래로')
-        self.que_clear_button = QPushButton(QIcon('./assets/clear.png'), '')
+        self.que_clear_button = QPushButton(QIcon(':/clear.png'), '')
         self.que_clear_button.setIconSize(icon_size)
         self.que_clear_button.setFixedSize(icon_button_size)
         self.que_clear_button.setToolTip('비우기')
@@ -146,23 +147,23 @@ class App(QMainWindow):
         self.file_list = QTreeWidget()
         self.file_list.setAcceptDrops(True)
         self.file_list.setHeaderLabels(['이름', '경로'])
-        self.file_file_open = QPushButton(QIcon('./assets/file.png'), '')
+        self.file_file_open = QPushButton(QIcon(':/file.png'), '')
         self.file_file_open.setFixedSize(icon_button_size)
         self.file_file_open.setIconSize(icon_size)
         self.file_file_open.setToolTip('파일 열기')
-        self.file_dir_open = QPushButton(QIcon('./assets/folder.png'), '')
+        self.file_dir_open = QPushButton(QIcon(':/folder.png'), '')
         self.file_dir_open.setFixedSize(icon_button_size)
         self.file_dir_open.setIconSize(icon_size)
         self.file_dir_open.setToolTip('폴더 열기')
-        self.file_delete = QPushButton(QIcon('./assets/remove.png'), '')
+        self.file_delete = QPushButton(QIcon(':/remove.png'), '')
         self.file_delete.setFixedSize(icon_button_size)
         self.file_delete.setIconSize(icon_size)
         self.file_delete.setToolTip('목록 삭제')
-        self.file_clear = QPushButton(QIcon('./assets/clear.png'), '')
+        self.file_clear = QPushButton(QIcon(':/clear.png'), '')
         self.file_clear.setFixedSize(icon_button_size)
         self.file_clear.setIconSize(icon_size)
         self.file_clear.setToolTip('비우기')
-        self.file_encode = QPushButton(QIcon('./assets/encode.png'), '')
+        self.file_encode = QPushButton(QIcon(':/encode.png'), '')
         self.file_encode.setFixedSize(icon_button_size)
         self.file_encode.setIconSize(icon_size)
         self.file_encode.setToolTip('인코딩 설정')
@@ -267,10 +268,9 @@ class App(QMainWindow):
         self.save_layout.addWidget(self.save_dir_line, 1, 1, 1, 2)
         self.save_layout.addWidget(self.save_dir_find, 1, 3, 1, 1)
 
-        self.setWindowTitle('Batch SAMI Sync v0.1')
+        self.setWindowTitle('Batch SAMI Sync v0.2')
         self.setCentralWidget(self.central_widget)
         self.adjustSize()
-        self.show()
 
     def attach_event(self):
         # Default encoding hack
@@ -338,6 +338,7 @@ class App(QMainWindow):
             self.save_dir_line.setText(selected)
 
         def apply():
+            self.ok_button.setEnabled(False)
             ques = Utils.read_list(self.que_list, False)
             files = Utils.read_list(self.file_list, False)
             strip = False if self.save_strip.isChecked() else True
@@ -358,6 +359,7 @@ class App(QMainWindow):
 
             else:
                 QMessageBox.information(self, 'Batch SAMI Sync', '변환 완료!')
+            self.ok_button.setEnabled(True)
 
         self.tab1_add_button.clicked.connect(tab1_add)
         self.tab2_add_button.clicked.connect(tab2_add)
@@ -398,6 +400,13 @@ class App(QMainWindow):
                     if fnmatch(file, '*.smi'):
                         name = ntpath.basename(file)
                         Utils.insert_list(self.file_list, name, file)
+                    elif not fnmatch(file, '*.*'):
+                        for paths, subdirs, files in os.walk(file):
+                            for file in files:
+                                if fnmatch(file, '*.smi'):
+                                    name = ntpath.basename(file)
+                                    Utils.insert_list(self.file_list, name, file)
+
         else:
             event.ignore()
 
@@ -519,5 +528,7 @@ class Utils:
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = App()
+    # app.setStyle('Fusion')
+    win = App()
+    win.show()
     sys.exit(app.exec_())
